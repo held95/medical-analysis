@@ -3,6 +3,7 @@
 import { useEffect, useMemo } from 'react';
 import { usePatientsStore } from '@/lib/store/patientsStore';
 import { AppointmentsCalendar } from '@/components/appointments/AppointmentsCalendar';
+import { NewAppointmentDialog } from '@/components/appointments/NewAppointmentDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, Clock, CheckCircle } from 'lucide-react';
@@ -46,12 +47,17 @@ export default function AgendamentosPage() {
     <div className="space-y-6 pb-8 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 -mx-6 -mt-6 px-6 pt-8 pb-12 mb-8 rounded-b-3xl shadow-xl">
-        <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
-          Agendamentos
-        </h1>
-        <p className="text-blue-100 text-lg">
-          Visualize e gerencie os agendamentos de exames
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
+              Agendamentos
+            </h1>
+            <p className="text-blue-100 text-lg">
+              Visualize e gerencie os agendamentos de exames
+            </p>
+          </div>
+          <NewAppointmentDialog />
+        </div>
       </div>
 
       {/* Stats Cards */}
