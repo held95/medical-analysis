@@ -1,15 +1,15 @@
 export const APP_CONFIG = {
   appName: 'Medical Analysis',
   appDescription: 'Sistema de Análise e Gerenciamento de Pacientes',
-  version: '2.0.0',
+  version: '3.0.0',
   locale: 'pt-BR',
   timezone: 'America/Sao_Paulo',
 };
 
 export const STORAGE_KEYS = {
-  patients: 'medical_analysis_patients_v2',
-  exams: 'medical_analysis_exams_v2',
-  settings: 'medical_analysis_settings_v2',
+  patients: 'medical_analysis_patients_v3',
+  exams: 'medical_analysis_exams_v3',
+  settings: 'medical_analysis_settings_v3',
 };
 
 export const PAGINATION = {

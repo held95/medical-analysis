@@ -143,10 +143,10 @@ export function generateMockExams(patientId: string, count: number): Exam[] {
     const statusRandom = Math.random();
     let status: ExamStatus;
 
-    // 50% completed, 30% scheduled, 15% pending, 5% cancelled
-    if (statusRandom > 0.8) {
+    // 40% completed, 40% scheduled, 15% pending, 5% cancelled
+    if (statusRandom > 0.85) {
       status = 'pending';
-    } else if (statusRandom > 0.5) {
+    } else if (statusRandom > 0.45) {
       status = 'scheduled';
     } else if (statusRandom > 0.05) {
       status = 'completed';
