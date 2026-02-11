@@ -209,6 +209,7 @@ export function generateMockPatients(count: number = 50): Patient[] {
       gender,
       email: generateEmail(name),
       phone: generatePhone(),
+      hasDocuments: Math.random() > 0.3, // 70% tem documentos, 30% não tem
       address: {
         street,
         number: String(Math.floor(Math.random() * 9999) + 1),

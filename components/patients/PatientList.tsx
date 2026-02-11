@@ -23,7 +23,7 @@ import {
   formatPhone,
   formatDate,
 } from '@/lib/utils/formatters';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye, FileCheck, FileX } from 'lucide-react';
 
 export function PatientList() {
   const patients = usePatientsStore((state) => state.patients);
@@ -61,6 +61,7 @@ export function PatientList() {
                 <TableHead>CPF</TableHead>
                 <TableHead>Idade</TableHead>
                 <TableHead>Telefone</TableHead>
+                <TableHead>Documentos</TableHead>
                 <TableHead>Exames Realizados</TableHead>
                 <TableHead>Última Visita</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
@@ -69,7 +70,7 @@ export function PatientList() {
             <TableBody>
               {currentPatients.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={8} className="text-center py-8">
                     <div className="text-muted-foreground">
                       <p className="text-lg font-medium">
                         Nenhum paciente cadastrado
@@ -87,6 +88,19 @@ export function PatientList() {
                     <TableCell>{formatCPF(patient.cpf)}</TableCell>
                     <TableCell>{patient.age} anos</TableCell>
                     <TableCell>{formatPhone(patient.phone)}</TableCell>
+                    <TableCell>
+                      {patient.hasDocuments ? (
+                        <Badge className="bg-green-600 hover:bg-green-700">
+                          <FileCheck className="h-3 w-3 mr-1" />
+                          Completo
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive">
+                          <FileX className="h-3 w-3 mr-1" />
+                          Pendente
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary">
                         {patient.examsCompleted.length}

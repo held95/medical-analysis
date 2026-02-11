@@ -84,6 +84,22 @@ export function FilterPanel({
             </SelectContent>
           </Select>
         </div>
+
+        <div className="space-y-2">
+          <Label>Documentos</Label>
+          <Select
+            onValueChange={(value) => onFilterChange({ hasDocuments: value })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="true">Com Documentos</SelectItem>
+              <SelectItem value="false">Sem Documentos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </CardContent>
     </Card>
   );

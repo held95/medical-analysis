@@ -25,6 +25,7 @@ import {
   validateEmail,
   validatePhone,
 } from '@/lib/utils/validators';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export function PatientForm() {
   const addPatient = usePatientsStore((state) => state.addPatient);
@@ -36,6 +37,7 @@ export function PatientForm() {
     gender: 'M',
     email: '',
     phone: '',
+    hasDocuments: false,
     address: {
       street: '',
       number: '',
@@ -87,6 +89,7 @@ export function PatientForm() {
         gender: 'M',
         email: '',
         phone: '',
+        hasDocuments: false,
         address: {
           street: '',
           number: '',
@@ -108,6 +111,7 @@ export function PatientForm() {
       gender: 'M',
       email: '',
       phone: '',
+      hasDocuments: false,
       address: { street: '', number: '', city: '', state: '', zipCode: '' },
     });
     setErrors({});
@@ -220,6 +224,22 @@ export function PatientForm() {
                 <p className="text-sm text-red-600">{errors.phone}</p>
               )}
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-4 pb-2 px-1">
+            <Checkbox
+              id="hasDocuments"
+              checked={formData.hasDocuments}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, hasDocuments: checked as boolean })
+              }
+            />
+            <Label
+              htmlFor="hasDocuments"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              Paciente possui documentos completos
+            </Label>
           </div>
 
           <div className="pt-4 border-t">

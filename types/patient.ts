@@ -8,6 +8,7 @@ export interface Patient {
   gender: 'M' | 'F';
   email: string;
   phone: string;
+  hasDocuments: boolean;
   address: {
     street: string;
     number: string;
@@ -29,6 +30,7 @@ export interface CreatePatientDTO {
   gender: 'M' | 'F';
   email: string;
   phone: string;
+  hasDocuments: boolean;
   address: {
     street: string;
     number: string;
