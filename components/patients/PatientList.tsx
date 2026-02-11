@@ -24,12 +24,16 @@ import {
   formatDate,
 } from '@/lib/utils/formatters';
 import { Edit, Trash2, Eye, FileCheck, FileX } from 'lucide-react';
+import { PatientDetailsModal } from './PatientDetailsModal';
+import { Patient } from '@/types';
 
 export function PatientList() {
   const patients = usePatientsStore((state) => state.patients);
   const deletePatient = usePatientsStore((state) => state.deletePatient);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(patients.length / itemsPerPage);
@@ -45,6 +49,11 @@ export function PatientList() {
         setCurrentPage(currentPage - 1);
       }
     }
+  };
+
+  const handleViewDetails = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setModalOpen(true);
   };
 
   return (
@@ -113,6 +122,7 @@ export function PatientList() {
                           variant="ghost"
                           size="icon"
                           title="Ver detalhes"
+                          onClick={() => handleViewDetails(patient)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -168,6 +178,12 @@ export function PatientList() {
           </div>
         )}
       </CardContent>
+
+      <PatientDetailsModal
+        patient={selectedPatient}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+      />
     </Card>
   );
 }

@@ -7,23 +7,19 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
-  FileText,
-  Settings,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Pacientes', href: '/pacientes', icon: Users },
   { name: 'Agendamentos', href: '/agendamentos', icon: Calendar },
-  { name: 'Relatórios', href: '/relatorios', icon: FileText },
-  { name: 'Configurações', href: '/configuracoes', icon: Settings },
 ];
 
 export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden md:flex items-center space-x-1 px-4 py-2 border-b">
+    <nav className="hidden md:flex items-center space-x-1 px-4 py-3 border-b bg-white shadow-sm">
       {navigation.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href;
@@ -33,10 +29,10 @@ export function Navigation() {
             key={item.name}
             href={item.href}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+              'flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all',
               isActive
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             )}
           >
             <Icon className="h-4 w-4" />

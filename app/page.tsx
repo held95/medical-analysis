@@ -18,7 +18,7 @@ export default function DashboardPage() {
     initializeStore();
   }, [initializeStore]);
 
-  // Aplicar filtros
+  // Aplicar filtros nos pacientes
   const filteredPatients = useMemo(() => {
     let filtered = [...patients];
 
@@ -34,12 +34,33 @@ export default function DashboardPage() {
     return filtered;
   }, [patients, filters]);
 
+  // Aplicar filtros nos exames
+  const filteredExams = useMemo(() => {
+    let filtered = [...exams];
+
+    // Filtrar por pacientes filtrados
+    const filteredPatientIds = new Set(filteredPatients.map((p) => p.id));
+    filtered = filtered.filter((e) => filteredPatientIds.has(e.patientId));
+
+    // Filtrar por tipo de exame
+    if (filters.examType && filters.examType !== 'all') {
+      filtered = filtered.filter((e) => e.name === filters.examType);
+    }
+
+    // Filtrar por status
+    if (filters.status && filters.status !== 'all') {
+      filtered = filtered.filter((e) => e.status === filters.status);
+    }
+
+    return filtered;
+  }, [exams, filteredPatients, filters]);
+
   const stats = useMemo((): StatsData => {
     const totalPatients = filteredPatients.length;
-    const totalExams = exams.length;
-    const completedExams = exams.filter((e) => e.status === 'completed').length;
-    const pendingExams = exams.filter((e) => e.status === 'pending').length;
-    const scheduledExams = exams.filter((e) => e.status === 'scheduled').length;
+    const totalExams = filteredExams.length;
+    const completedExams = filteredExams.filter((e) => e.status === 'completed').length;
+    const pendingExams = filteredExams.filter((e) => e.status === 'pending').length;
+    const scheduledExams = filteredExams.filter((e) => e.status === 'scheduled').length;
     const averageExamsPerPatient =
       totalPatients > 0 ? totalExams / totalPatients : 0;
 
@@ -51,10 +72,10 @@ export default function DashboardPage() {
       scheduledExams,
       averageExamsPerPatient,
     };
-  }, [filteredPatients, exams]);
+  }, [filteredPatients, filteredExams]);
 
   const examChartData = useMemo((): ChartData[] => {
-    const examCounts = exams.reduce(
+    const examCounts = filteredExams.reduce(
       (acc, exam) => {
         acc[exam.name] = (acc[exam.name] || 0) + 1;
         return acc;
@@ -66,13 +87,13 @@ export default function DashboardPage() {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
-  }, [exams]);
+  }, [filteredExams]);
 
   const documentStats = useMemo(() => {
-    const withDocs = patients.filter((p) => p.hasDocuments).length;
-    const withoutDocs = patients.filter((p) => !p.hasDocuments).length;
+    const withDocs = filteredPatients.filter((p) => p.hasDocuments).length;
+    const withoutDocs = filteredPatients.filter((p) => !p.hasDocuments).length;
     return { withDocs, withoutDocs };
-  }, [patients]);
+  }, [filteredPatients]);
 
   const handleSearch = (query: string) => {
     console.log('Searching:', query);
@@ -87,7 +108,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8 pb-8">
+    <div className="space-y-6 pb-8 bg-gray-50 min-h-screen">
       {/* Header com gradiente */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 -mx-6 -mt-6 px-6 pt-8 pb-12 mb-8 rounded-b-3xl shadow-xl">
         <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
@@ -96,15 +117,22 @@ export default function DashboardPage() {
         <p className="text-blue-100 text-lg">
           Visão geral e análise de pacientes e exames
         </p>
+        {Object.keys(filters).length > 0 && (
+          <div className="mt-4 flex items-center gap-2">
+            <Badge variant="secondary" className="bg-white/20 text-white border-0">
+              Filtros ativos: {Object.keys(filters).filter(k => filters[k] && filters[k] !== 'all').length}
+            </Badge>
+          </div>
+        )}
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="-mt-20 relative z-10">
+      <div className="-mt-20 relative z-10 px-6">
         <StatsCards stats={stats} />
       </div>
 
       {/* Estatísticas de Documentos */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 px-6">
         <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-2xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all">
           <div className="flex items-center justify-between">
             <div>
@@ -116,7 +144,7 @@ export default function DashboardPage() {
               </p>
               <Badge className="mt-2 bg-green-600">
                 <FileCheck className="h-3 w-3 mr-1" />
-                {((documentStats.withDocs / patients.length) * 100).toFixed(1)}%
+                {filteredPatients.length > 0 ? ((documentStats.withDocs / filteredPatients.length) * 100).toFixed(1) : 0}%
               </Badge>
             </div>
             <FileCheck className="h-16 w-16 text-green-600 opacity-20" />
@@ -134,10 +162,7 @@ export default function DashboardPage() {
               </p>
               <Badge className="mt-2 bg-orange-600">
                 <FileX className="h-3 w-3 mr-1" />
-                {((documentStats.withoutDocs / patients.length) * 100).toFixed(
-                  1
-                )}
-                %
+                {filteredPatients.length > 0 ? ((documentStats.withoutDocs / filteredPatients.length) * 100).toFixed(1) : 0}%
               </Badge>
             </div>
             <FileX className="h-16 w-16 text-orange-600 opacity-20" />
@@ -146,7 +171,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3 px-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-2xl shadow-md">
             <SearchBar onSearch={handleSearch} />
@@ -154,7 +179,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <ExamsChart
               data={examChartData}
-              title="Top 10 Exames Mais Realizados"
+              title={`Top ${examChartData.length} Exames Mais Realizados`}
             />
           </div>
         </div>
@@ -177,12 +202,12 @@ export default function DashboardPage() {
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
-                <span>Use os filtros para refinar a busca</span>
+                <span>Filtros afetam gráficos e estatísticas</span>
               </li>
               <li className="flex items-start">
                 <span className="mr-2">•</span>
                 <span>
-                  Acesse a aba "Pacientes" para cadastrar novos registros
+                  Acesse "Pacientes" para cadastrar novos registros
                 </span>
               </li>
             </ul>
