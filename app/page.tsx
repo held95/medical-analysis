@@ -110,7 +110,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 pb-8 bg-gray-50 min-h-screen">
       {/* Header com gradiente */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 -mx-6 -mt-6 px-6 pt-8 pb-12 mb-8 rounded-b-3xl shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 -mx-6 -mt-6 px-6 pt-8 pb-16 rounded-b-3xl shadow-xl">
         <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
           Dashboard Médico
         </h1>
@@ -127,56 +127,56 @@ export default function DashboardPage() {
       </div>
 
       {/* Cards de Estatísticas */}
-      <div className="-mt-20 relative z-10 px-6">
+      <div className="-mt-24 relative z-10 px-6">
         <StatsCards stats={stats} />
       </div>
 
       {/* Estatísticas de Documentos */}
-      <div className="grid gap-4 md:grid-cols-2 px-6">
+      <div className="grid gap-4 md:grid-cols-2 px-6 mt-6">
         <div className="bg-gradient-to-br from-green-50 to-emerald-100 p-6 rounded-2xl border-2 border-green-200 shadow-md hover:shadow-lg transition-all">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-medium text-green-700 mb-1">
                 Pacientes com Documentos
               </p>
               <p className="text-3xl font-bold text-green-900">
                 {documentStats.withDocs}
               </p>
-              <Badge className="mt-2 bg-green-600">
+              <Badge className="mt-2 bg-green-600 text-white">
                 <FileCheck className="h-3 w-3 mr-1" />
                 {filteredPatients.length > 0 ? ((documentStats.withDocs / filteredPatients.length) * 100).toFixed(1) : 0}%
               </Badge>
             </div>
-            <FileCheck className="h-16 w-16 text-green-600 opacity-20" />
+            <FileCheck className="h-16 w-16 text-green-600 opacity-20 flex-shrink-0" />
           </div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-50 to-red-100 p-6 rounded-2xl border-2 border-orange-200 shadow-md hover:shadow-lg transition-all">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-medium text-orange-700 mb-1">
                 Pacientes sem Documentos
               </p>
               <p className="text-3xl font-bold text-orange-900">
                 {documentStats.withoutDocs}
               </p>
-              <Badge className="mt-2 bg-orange-600">
+              <Badge className="mt-2 bg-orange-600 text-white">
                 <FileX className="h-3 w-3 mr-1" />
                 {filteredPatients.length > 0 ? ((documentStats.withoutDocs / filteredPatients.length) * 100).toFixed(1) : 0}%
               </Badge>
             </div>
-            <FileX className="h-16 w-16 text-orange-600 opacity-20" />
+            <FileX className="h-16 w-16 text-orange-600 opacity-20 flex-shrink-0" />
           </div>
         </div>
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="grid gap-6 lg:grid-cols-3 px-6">
+      <div className="grid gap-6 lg:grid-cols-3 px-6 mt-6">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-2xl shadow-md">
             <SearchBar onSearch={handleSearch} />
           </div>
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-6">
             <ExamsChart
               data={examChartData}
               title={`Top ${examChartData.length} Exames Mais Realizados`}

@@ -143,12 +143,15 @@ export function generateMockExams(patientId: string, count: number): Exam[] {
     const statusRandom = Math.random();
     let status: ExamStatus;
 
-    if (statusRandom > 0.7) {
+    // 50% completed, 30% scheduled, 15% pending, 5% cancelled
+    if (statusRandom > 0.8) {
       status = 'pending';
     } else if (statusRandom > 0.5) {
       status = 'scheduled';
-    } else {
+    } else if (statusRandom > 0.05) {
       status = 'completed';
+    } else {
+      status = 'cancelled';
     }
 
     let category: 'laboratorial' | 'imagem' | 'cardiológico' = 'laboratorial';
@@ -158,20 +161,22 @@ export function generateMockExams(patientId: string, count: number): Exam[] {
       category = 'cardiológico';
     }
 
+    // Gerar data futura para exames agendados (próximos 60 dias)
+    const futureDate = new Date(now.getTime() + Math.random() * 60 * 24 * 60 * 60 * 1000);
+
     const exam: Exam = {
-      id: `exam-${patientId}-${i}-${Date.now()}`,
+      id: `exam-${patientId}-${i}-${Date.now()}-${Math.random()}`,
       patientId,
       name: examType,
       category,
-      date: status === 'completed' ? generateRandomDate(sixMonthsAgo, now) : '',
-      scheduledDate:
-        status !== 'completed'
-          ? generateRandomDate(
-              now,
-              new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-            )
-          : undefined,
+      date: status === 'completed'
+        ? generateRandomDate(sixMonthsAgo, now)
+        : status === 'scheduled'
+        ? futureDate.toISOString()
+        : generateRandomDate(sixMonthsAgo, now),
+      scheduledDate: status === 'scheduled' ? futureDate.toISOString() : undefined,
       result: status === 'completed' ? 'Normal' : undefined,
+      notes: status === 'scheduled' ? 'Consulta agendada' : undefined,
       status,
       createdAt: generateRandomDate(sixMonthsAgo, now),
       updatedAt: generateRandomDate(sixMonthsAgo, now),
@@ -209,7 +214,7 @@ export function generateMockPatients(count: number = 50): Patient[] {
       gender,
       email: generateEmail(name),
       phone: generatePhone(),
-      hasDocuments: Math.random() > 0.3, // 70% tem documentos, 30% não tem
+      hasDocuments: Math.random() > 0.4, // 60% tem documentos, 40% não tem
       address: {
         street,
         number: String(Math.floor(Math.random() * 9999) + 1),
