@@ -4,28 +4,28 @@ import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { usePatientsStore } from '@/lib/store/patientsStore';
+import { useEmployeesStore } from '@/lib/store/employeesStore';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, User, Clock } from 'lucide-react';
 import { formatDate } from '@/lib/utils/formatters';
 
 export function AppointmentsCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { patients, exams } = usePatientsStore();
+  const { employees, exams } = useEmployeesStore();
 
   // Get scheduled exams
   const scheduledExams = useMemo(() => {
     return exams.filter((exam) => exam.status === 'scheduled');
   }, [exams]);
 
-  // Get patient name by ID
-  const getPatientName = (patientId: string) => {
-    const patient = patients.find((p) => p.id === patientId);
-    return patient ? patient.name : 'Desconhecido';
+  // Get employee name by ID
+  const getEmployeeName = (employeeId: string) => {
+    const employee = employees.find((e) => e.id === employeeId);
+    return employee ? employee.name : 'Desconhecido';
   };
 
-  // Get patient data by ID
-  const getPatient = (patientId: string) => {
-    return patients.find((p) => p.id === patientId);
+  // Get employee data by ID
+  const getEmployee = (employeeId: string) => {
+    return employees.find((e) => e.id === employeeId);
   };
 
   // Get appointments for a specific date
@@ -239,7 +239,7 @@ export function AppointmentsCalendar() {
           ) : (
             <div className="space-y-3 max-h-[600px] overflow-y-auto">
               {selectedAppointments.map((exam) => {
-                const patient = getPatient(exam.patientId);
+                const employee = getEmployee(exam.employeeId);
                 return (
                   <div
                     key={exam.id}
@@ -251,7 +251,7 @@ export function AppointmentsCalendar() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-gray-900">
-                          {getPatientName(exam.patientId)}
+                          {getEmployeeName(exam.employeeId)}
                         </p>
                         <p className="text-sm text-gray-700 font-medium mt-1">
                           {exam.name}
@@ -259,13 +259,13 @@ export function AppointmentsCalendar() {
                         <p className="text-xs text-gray-600 mt-1">
                           Categoria: {exam.category}
                         </p>
-                        {patient && (
+                        {employee && (
                           <div className="flex items-center gap-2 mt-2">
                             <Badge variant="secondary" className="text-xs">
-                              {patient.age} anos
+                              Mat: {employee.matricula}
                             </Badge>
                             <Badge variant="secondary" className="text-xs">
-                              {patient.gender === 'M' ? 'M' : 'F'}
+                              {employee.setor}
                             </Badge>
                           </div>
                         )}

@@ -7,9 +7,9 @@ import { Navigation } from "@/components/layout/Navigation";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Medical Analysis - Sistema de Análise Médica",
-  description: "Sistema de gerenciamento de pacientes e exames médicos",
-  keywords: ["saúde", "exames", "pacientes", "análise médica"],
+  title: "Sistema ASO - Controle de Atestado de Saúde Ocupacional",
+  description: "Sistema de gerenciamento de funcionários e exames ocupacionais ASO",
+  keywords: ["ASO", "saúde ocupacional", "exames", "funcionários", "aderência"],
 };
 
 export default function RootLayout({

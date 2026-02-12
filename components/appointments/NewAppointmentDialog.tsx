@@ -19,17 +19,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { usePatientsStore } from '@/lib/store/patientsStore';
-import { EXAM_TYPES } from '@/constants/exams';
+import { useEmployeesStore } from '@/lib/store/employeesStore';
+import { ASO_EXAM_TYPES } from '@/constants/exams';
 import { Calendar, Plus } from 'lucide-react';
 import { Exam, ExamType, ExamCategory } from '@/types';
 
 export function NewAppointmentDialog() {
   const [open, setOpen] = useState(false);
-  const { patients, addExam } = usePatientsStore();
+  const { employees, addExam } = useEmployeesStore();
 
   const [formData, setFormData] = useState({
-    patientId: '',
+    employeeId: '',
     examType: '',
     date: '',
     time: '',
@@ -39,23 +39,29 @@ export function NewAppointmentDialog() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.patientId || !formData.examType || !formData.date || !formData.time) {
+    if (!formData.employeeId || !formData.examType || !formData.date || !formData.time) {
       alert('Preencha todos os campos obrigatórios');
       return;
     }
 
     const dateTime = `${formData.date}T${formData.time}:00`;
 
-    // Determinar categoria baseada no tipo de exame
+    // Determinar categoria baseada no tipo de exame ASO
     let category: ExamCategory = 'laboratorial';
-    if (['Raio-X', 'Ultrassonografia'].includes(formData.examType)) {
+    if (['Visio Teste', 'Audiometria'].includes(formData.examType)) {
+      category = 'clinico';
+    } else if (['Raio X Tórax OIT', 'Coluna Lombar'].includes(formData.examType)) {
       category = 'imagem';
-    } else if (['Eletrocardiograma', 'Teste ergométrico'].includes(formData.examType)) {
+    } else if (formData.examType === 'Espirometria') {
+      category = 'funcional';
+    } else if (formData.examType === 'ECG') {
       category = 'cardiológico';
+    } else if (formData.examType === 'EEG') {
+      category = 'neurológico';
     }
 
-    const newExam: Omit<Exam, 'id' | 'createdAt' | 'updatedAt'> = {
-      patientId: formData.patientId,
+    const newExam: Omit<Exam, 'id' | 'createdAt' | 'updatedAt' | 'expirationDate'> = {
+      employeeId: formData.employeeId,
       name: formData.examType as ExamType,
       category,
       date: new Date(dateTime).toISOString(),
@@ -68,7 +74,7 @@ export function NewAppointmentDialog() {
 
     // Reset form
     setFormData({
-      patientId: '',
+      employeeId: '',
       examType: '',
       date: '',
       time: '',
@@ -100,20 +106,20 @@ export function NewAppointmentDialog() {
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="patient">Paciente *</Label>
+            <Label htmlFor="employee">Funcionário *</Label>
             <Select
-              value={formData.patientId}
+              value={formData.employeeId}
               onValueChange={(value) =>
-                setFormData({ ...formData, patientId: value })
+                setFormData({ ...formData, employeeId: value })
               }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um paciente" />
+                <SelectValue placeholder="Selecione um funcionário" />
               </SelectTrigger>
               <SelectContent className="max-h-64">
-                {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id}>
-                    {patient.name} - {patient.cpf}
+                {employees.map((employee) => (
+                  <SelectItem key={employee.id} value={employee.id}>
+                    {employee.name} - {employee.matricula}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -121,7 +127,7 @@ export function NewAppointmentDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="examType">Tipo de Exame *</Label>
+            <Label htmlFor="examType">Tipo de Exame ASO *</Label>
             <Select
               value={formData.examType}
               onValueChange={(value) =>
@@ -132,7 +138,7 @@ export function NewAppointmentDialog() {
                 <SelectValue placeholder="Selecione o tipo de exame" />
               </SelectTrigger>
               <SelectContent className="max-h-64">
-                {EXAM_TYPES.map((type) => (
+                {ASO_EXAM_TYPES.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
                   </SelectItem>

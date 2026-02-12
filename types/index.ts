@@ -1,3 +1,4 @@
-export * from './patient';
+export * from './employee';
 export * from './exam';
 export * from './filters';
+export * from './adherence';

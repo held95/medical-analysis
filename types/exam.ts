@@ -1,30 +1,40 @@
-export type ExamStatus = 'completed' | 'pending' | 'scheduled' | 'cancelled';
+export type ExamStatus =
+  | 'completed'
+  | 'pending'
+  | 'scheduled'
+  | 'cancelled'
+  | 'expired';
 
 export type ExamType =
-  | 'Hemograma completo'
-  | 'Glicemia em jejum'
-  | 'Colesterol total e frações'
-  | 'Triglicerídeos'
-  | 'Ureia e creatinina'
-  | 'TSH e T4 livre'
-  | 'Raio-X'
-  | 'Ultrassonografia'
-  | 'Eletrocardiograma'
-  | 'Teste ergométrico'
-  | 'Hemoglobina glicada'
-  | 'TGO e TGP'
-  | 'Vitamina D'
-  | 'Ácido úrico';
+  | 'Audiometria'
+  | 'Visio Teste'
+  | 'Raio X Tórax OIT'
+  | 'Coluna Lombar'
+  | 'TQHA URINA'
+  | 'Hemograma c/ plaquetas'
+  | 'Espirometria'
+  | 'Glicemia'
+  | 'Carboxihemoglobina'
+  | 'ECG'
+  | 'EEG';
 
-export type ExamCategory = 'laboratorial' | 'imagem' | 'cardiológico';
+export type ExamCategory =
+  | 'clinico'
+  | 'laboratorial'
+  | 'imagem'
+  | 'funcional'
+  | 'cardiológico'
+  | 'neurológico';
 
 export interface Exam {
   id: string;
-  patientId: string;
+  employeeId: string; // Renomeado de patientId
   name: ExamType;
   category: ExamCategory;
   date: string;
   scheduledDate?: string;
+  expirationDate?: string; // Novo: data de vencimento
+  validityPeriod?: number; // Novo: período de validade em meses
   result?: string;
   resultValue?: string;
   referenceRange?: string;
@@ -36,7 +46,7 @@ export interface Exam {
 }
 
 export interface CreateExamDTO {
-  patientId: string;
+  employeeId: string; // Renomeado de patientId
   name: ExamType;
   category: ExamCategory;
   scheduledDate?: string;

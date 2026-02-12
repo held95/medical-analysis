@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { usePatientsStore } from '@/lib/store/patientsStore';
+import { useEmployeesStore } from '@/lib/store/employeesStore';
 import { AppointmentsCalendar } from '@/components/appointments/AppointmentsCalendar';
 import { NewAppointmentDialog } from '@/components/appointments/NewAppointmentDialog';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, Clock, CheckCircle } from 'lucide-react';
 
 export default function AgendamentosPage() {
-  const { exams, patients, initializeStore } = usePatientsStore();
+  const { exams, employees, initializeStore } = useEmployeesStore();
 
   useEffect(() => {
     initializeStore();
@@ -32,14 +32,14 @@ export default function AgendamentosPage() {
       return examDate.getTime() === today.getTime();
     });
 
-    // Get unique patients with scheduled exams
-    const uniquePatientIds = new Set(scheduledExams.map((e) => e.patientId));
+    // Get unique employees with scheduled exams
+    const uniqueEmployeeIds = new Set(scheduledExams.map((e) => e.employeeId));
 
     return {
       total: scheduledExams.length,
       upcoming: upcomingExams.length,
       today: todayExams.length,
-      patients: uniquePatientIds.size,
+      employees: uniqueEmployeeIds.size,
     };
   }, [exams]);
 
@@ -113,9 +113,9 @@ export default function AgendamentosPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
-                  Pacientes
+                  Funcionários
                 </p>
-                <p className="text-3xl font-bold text-gray-900">{stats.patients}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.employees}</p>
               </div>
               <div className="h-12 w-12 rounded-xl bg-purple-100 flex items-center justify-center">
                 <Users className="h-6 w-6 text-purple-600" />

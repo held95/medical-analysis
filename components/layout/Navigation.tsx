@@ -7,11 +7,15 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
+  FileSpreadsheet,
+  BarChart3,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Pacientes', href: '/pacientes', icon: Users },
+  { name: 'Análise', href: '/analise', icon: BarChart3 },
+  { name: 'Funcionários', href: '/funcionarios', icon: Users },
+  { name: 'Controle ASO', href: '/aso', icon: FileSpreadsheet },
   { name: 'Agendamentos', href: '/agendamentos', icon: Calendar },
 ];
 

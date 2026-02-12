@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { usePatientsStore } from '@/lib/store/patientsStore';
+import { useEmployeesStore } from '@/lib/store/employeesStore';
 import { formatCPF } from '@/lib/utils/formatters';
 import { Badge } from '@/components/ui/badge';
 
@@ -20,24 +20,25 @@ interface SearchBarProps {
 
 export function SearchBar({
   onSearch,
-  placeholder = 'Buscar pacientes...',
+  placeholder = 'Buscar funcionários...',
 }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const patients = usePatientsStore((state) => state.patients);
+  const employees = useEmployeesStore((state) => state.employees);
 
-  const filteredPatients = useMemo(() => {
-    if (!query) return patients.slice(0, 10); // Show first 10 if no query
+  const filteredEmployees = useMemo(() => {
+    if (!query) return employees.slice(0, 10); // Show first 10 if no query
 
     const lowerQuery = query.toLowerCase();
-    return patients
-      .filter((patient) => {
-        const nameMatch = patient.name.toLowerCase().includes(lowerQuery);
-        const cpfMatch = patient.cpf.includes(query);
-        return nameMatch || cpfMatch;
+    return employees
+      .filter((employee) => {
+        const nameMatch = employee.name.toLowerCase().includes(lowerQuery);
+        const cpfMatch = employee.cpf.includes(query);
+        const matriculaMatch = employee.matricula.includes(query);
+        return nameMatch || cpfMatch || matriculaMatch;
       })
       .slice(0, 10); // Limit to 10 results
-  }, [patients, query]);
+  }, [employees, query]);
 
   const handleSearch = (value: string) => {
     setQuery(value);
@@ -53,9 +54,9 @@ export function SearchBar({
     setDropdownOpen(false);
   };
 
-  const selectPatient = (patientName: string) => {
-    setQuery(patientName);
-    onSearch(patientName);
+  const selectEmployee = (employeeName: string) => {
+    setQuery(employeeName);
+    onSearch(employeeName);
     setDropdownOpen(false);
   };
 
@@ -88,7 +89,7 @@ export function SearchBar({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7"
-                title="Selecionar paciente"
+                title="Selecionar funcionário"
               >
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -99,19 +100,19 @@ export function SearchBar({
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
               <div className="max-h-96 overflow-y-auto">
-                {filteredPatients.length === 0 ? (
+                {filteredEmployees.length === 0 ? (
                   <div className="p-4 text-center text-sm text-muted-foreground">
-                    Nenhum paciente encontrado
+                    Nenhum funcionário encontrado
                   </div>
                 ) : (
                   <div className="p-2">
                     <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground border-b mb-2">
-                      PACIENTES ({filteredPatients.length})
+                      FUNCIONÁRIOS ({filteredEmployees.length})
                     </div>
-                    {filteredPatients.map((patient) => (
+                    {filteredEmployees.map((employee) => (
                       <button
-                        key={patient.id}
-                        onClick={() => selectPatient(patient.name)}
+                        key={employee.id}
+                        onClick={() => selectEmployee(employee.name)}
                         className="w-full text-left p-3 hover:bg-gray-100 rounded-lg transition-colors flex items-start gap-3 group"
                       >
                         <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
@@ -119,29 +120,29 @@ export function SearchBar({
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-sm text-gray-900 group-hover:text-blue-600 transition-colors">
-                            {patient.name}
+                            {employee.name}
                           </p>
                           <p className="text-xs text-gray-600">
-                            CPF: {formatCPF(patient.cpf)}
+                            Mat: {employee.matricula} | CPF: {formatCPF(employee.cpf)}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             <Badge
                               variant="secondary"
                               className="text-xs px-2 py-0"
                             >
-                              {patient.age} anos
+                              {employee.setor}
                             </Badge>
                             <Badge
                               variant="secondary"
                               className="text-xs px-2 py-0"
                             >
-                              {patient.gender === 'M' ? 'Masculino' : 'Feminino'}
+                              {employee.cargo}
                             </Badge>
                             <Badge
                               variant="secondary"
                               className="text-xs px-2 py-0"
                             >
-                              {patient.examsCompleted.length} exames
+                              {employee.examsCompleted.length} exames
                             </Badge>
                           </div>
                         </div>

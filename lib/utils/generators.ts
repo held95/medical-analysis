@@ -1,85 +1,59 @@
-import { Patient, Exam, ExamStatus } from '@/types';
-import { EXAM_TYPES } from '@/constants/exams';
+import { Employee, Exam, ExamStatus, ExamType } from '@/types';
+import { ASO_EXAM_TYPES, EXAM_VALIDITY_PERIODS } from '@/constants/exams';
+import { SETORES, CARGOS, TURNOS } from '@/constants/aso';
+import { getExamExpirationDate } from './adherence';
 
 const BRAZILIAN_NAMES = [
-  'João Silva Santos',
-  'Maria Oliveira Costa',
-  'Pedro Rodrigues Alves',
-  'Ana Paula Ferreira',
-  'Carlos Eduardo Souza',
-  'Juliana Martins Lima',
-  'Fernando Henrique Rocha',
-  'Patricia Silva Gomes',
-  'Ricardo Alves Pereira',
-  'Camila Costa Ribeiro',
-  'Lucas Fernandes Carvalho',
-  'Beatriz Souza Araújo',
-  'Rafael Santos Dias',
-  'Amanda Lima Cardoso',
-  'Gustavo Pereira Castro',
-  'Larissa Martins Correia',
-  'Bruno Oliveira Barbosa',
-  'Gabriela Ferreira Monteiro',
-  'Thiago Costa Nascimento',
-  'Mariana Alves Teixeira',
-  'Diego Silva Duarte',
-  'Isabella Santos Ramos',
-  'Vinicius Rodrigues Moreira',
-  'Leticia Oliveira Barros',
-  'André Ferreira Campos',
-  'Carolina Costa Xavier',
-  'Marcelo Santos Moura',
-  'Natalia Silva Mendes',
-  'Felipe Alves Azevedo',
-  'Vanessa Rodrigues Nunes',
-  'Rodrigo Santos Lopes',
-  'Renata Oliveira Melo',
-  'Eduardo Costa Farias',
-  'Aline Ferreira Siqueira',
-  'Leandro Silva Macedo',
-  'Fernanda Santos Batista',
-  'Daniel Alves Viana',
-  'Juliane Rodrigues Reis',
-  'Mateus Costa Aguiar',
-  'Priscila Silva Freitas',
-  'Caio Santos Pinto',
-  'Bianca Oliveira Cavalcanti',
-  'Leonardo Ferreira Melo',
-  'Viviane Costa Pires',
-  'Gabriel Silva Cardoso',
-  'Tatiane Alves Monteiro',
-  'Henrique Rodrigues Xavier',
-  'Adriana Santos Ribeiro',
-  'Fabio Costa Lima',
-  'Simone Oliveira Nascimento',
-];
-
-const BRAZILIAN_CITIES = [
-  { city: 'São Paulo', state: 'SP' },
-  { city: 'Rio de Janeiro', state: 'RJ' },
-  { city: 'Belo Horizonte', state: 'MG' },
-  { city: 'Curitiba', state: 'PR' },
-  { city: 'Porto Alegre', state: 'RS' },
-  { city: 'Brasília', state: 'DF' },
-  { city: 'Salvador', state: 'BA' },
-  { city: 'Fortaleza', state: 'CE' },
-  { city: 'Recife', state: 'PE' },
-  { city: 'Manaus', state: 'AM' },
-];
-
-const STREETS = [
-  'Rua das Flores',
-  'Av. Paulista',
-  'Rua dos Três Irmãos',
-  'Av. Brasil',
-  'Rua do Comércio',
-  'Av. Atlântica',
-  'Rua Sete de Setembro',
-  'Av. Ipiranga',
-  'Rua Augusta',
-  'Av. Faria Lima',
-  'Rua Oscar Freire',
-  'Av. Rebouças',
+  'ADILSON RAIMUNDO',
+  'ADRIANO GALVÃO DE GÓIS',
+  'ADRIANO ROSA',
+  'ADRENA FONSECA DE SOUSA',
+  'ADRIANA FERREIRA DE OLIVEIRA',
+  'EDUARDO GALDINO DE SOUZA',
+  'JOÃO SILVA SANTOS',
+  'MARIA OLIVEIRA COSTA',
+  'PEDRO RODRIGUES ALVES',
+  'ANA PAULA FERREIRA',
+  'CARLOS EDUARDO SOUZA',
+  'JULIANA MARTINS LIMA',
+  'FERNANDO HENRIQUE ROCHA',
+  'PATRICIA SILVA GOMES',
+  'RICARDO ALVES PEREIRA',
+  'CAMILA COSTA RIBEIRO',
+  'LUCAS FERNANDES CARVALHO',
+  'BEATRIZ SOUZA ARAÚJO',
+  'RAFAEL SANTOS DIAS',
+  'AMANDA LIMA CARDOSO',
+  'GUSTAVO PEREIRA CASTRO',
+  'LARISSA MARTINS CORREIA',
+  'BRUNO OLIVEIRA BARBOSA',
+  'GABRIELA FERREIRA MONTEIRO',
+  'THIAGO COSTA NASCIMENTO',
+  'MARIANA ALVES TEIXEIRA',
+  'DIEGO SILVA DUARTE',
+  'ISABELLA SANTOS RAMOS',
+  'VINICIUS RODRIGUES MOREIRA',
+  'LETICIA OLIVEIRA BARROS',
+  'ANDRÉ FERREIRA CAMPOS',
+  'CAROLINA COSTA XAVIER',
+  'MARCELO SANTOS MOURA',
+  'NATALIA SILVA MENDES',
+  'FELIPE ALVES AZEVEDO',
+  'VANESSA RODRIGUES NUNES',
+  'RODRIGO SANTOS LOPES',
+  'RENATA OLIVEIRA MELO',
+  'EDUARDO COSTA FARIAS',
+  'ALINE FERREIRA SIQUEIRA',
+  'LEANDRO SILVA MACEDO',
+  'FERNANDA SANTOS BATISTA',
+  'DANIEL ALVES VIANA',
+  'JULIANE RODRIGUES REIS',
+  'MATEUS COSTA AGUIAR',
+  'PRISCILA SILVA FREITAS',
+  'CAIO SANTOS PINTO',
+  'BIANCA OLIVEIRA CAVALCANTI',
+  'LEONARDO FERREIRA MELO',
+  'VIVIANE COSTA PIRES',
 ];
 
 export function generateCPF(): string {
@@ -126,120 +100,161 @@ export function generateEmail(name: string): string {
   return `${cleanName}@${domain}`;
 }
 
+export function generateMatricula(): string {
+  return String(Math.floor(Math.random() * 900000) + 100000);
+}
+
 function generateRandomDate(start: Date, end: Date): string {
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime())
   ).toISOString();
 }
 
-export function generateMockExams(patientId: string, count: number): Exam[] {
+function getExamCategory(examType: ExamType): any {
+  if (['Visio Teste', 'Audiometria'].includes(examType)) return 'clinico';
+  if (['Hemograma c/ plaquetas', 'Glicemia', 'TQHA URINA', 'Carboxihemoglobina'].includes(examType)) return 'laboratorial';
+  if (['Raio X Tórax OIT', 'Coluna Lombar'].includes(examType)) return 'imagem';
+  if (examType === 'Espirometria') return 'funcional';
+  if (examType === 'ECG') return 'cardiológico';
+  if (examType === 'EEG') return 'neurológico';
+  return 'laboratorial';
+}
+
+export function generateMockExams(employeeId: string, count: number): Exam[] {
   const exams: Exam[] = [];
   const now = new Date();
-  const sixMonthsAgo = new Date(now);
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const oneYearAgo = new Date(now);
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-  for (let i = 0; i < count; i++) {
-    const examType = EXAM_TYPES[Math.floor(Math.random() * EXAM_TYPES.length)];
+  // Seleciona exames aleatórios, mas garante que tenha pelo menos os principais ASO
+  const selectedExamTypes = new Set<ExamType>();
+
+  // Adiciona exames obrigatórios ASO
+  selectedExamTypes.add('Audiometria');
+  selectedExamTypes.add('Visio Teste');
+  selectedExamTypes.add('Hemograma c/ plaquetas');
+  selectedExamTypes.add('ECG');
+
+  // Adiciona exames aleatórios até atingir a contagem
+  while (selectedExamTypes.size < count && selectedExamTypes.size < ASO_EXAM_TYPES.length) {
+    const randomExam = ASO_EXAM_TYPES[Math.floor(Math.random() * ASO_EXAM_TYPES.length)];
+    selectedExamTypes.add(randomExam);
+  }
+
+  selectedExamTypes.forEach((examType, index) => {
     const statusRandom = Math.random();
     let status: ExamStatus;
 
-    // 40% completed, 40% scheduled, 15% pending, 5% cancelled
-    if (statusRandom > 0.85) {
+    // 70% completed, 10% expired, 15% pending, 5% scheduled
+    if (statusRandom > 0.95) {
       status = 'pending';
-    } else if (statusRandom > 0.45) {
+    } else if (statusRandom > 0.90) {
       status = 'scheduled';
-    } else if (statusRandom > 0.05) {
-      status = 'completed';
+    } else if (statusRandom > 0.80) {
+      status = 'expired';
     } else {
-      status = 'cancelled';
+      status = 'completed';
     }
 
-    let category: 'laboratorial' | 'imagem' | 'cardiológico' = 'laboratorial';
-    if (['Raio-X', 'Ultrassonografia'].includes(examType)) {
-      category = 'imagem';
-    } else if (['Eletrocardiograma', 'Teste ergométrico'].includes(examType)) {
-      category = 'cardiológico';
-    }
+    const category = getExamCategory(examType);
+    const validityPeriod = EXAM_VALIDITY_PERIODS[examType] || 12;
 
-    // Gerar data futura para exames agendados (próximos 60 dias)
-    const futureDate = new Date(now.getTime() + Math.random() * 60 * 24 * 60 * 60 * 1000);
+    // Data do exame (passado para completed/expired, futuro para scheduled)
+    let examDate: string;
+    let expirationDate: string | undefined;
+
+    if (status === 'completed' || status === 'expired') {
+      // Exames completados nos últimos 12 meses
+      examDate = generateRandomDate(oneYearAgo, now);
+      expirationDate = getExamExpirationDate(examDate, validityPeriod).toISOString();
+
+      // Se for expired, ajusta a data para que realmente esteja vencido
+      if (status === 'expired') {
+        const oldDate = new Date(now);
+        oldDate.setMonth(oldDate.getMonth() - (validityPeriod + Math.floor(Math.random() * 6) + 1));
+        examDate = oldDate.toISOString();
+        expirationDate = getExamExpirationDate(examDate, validityPeriod).toISOString();
+      }
+    } else if (status === 'scheduled') {
+      // Exames agendados nos próximos 60 dias
+      const futureDate = new Date(now);
+      futureDate.setDate(futureDate.getDate() + Math.floor(Math.random() * 60) + 1);
+      examDate = futureDate.toISOString();
+    } else {
+      // Pending
+      examDate = now.toISOString();
+    }
 
     const exam: Exam = {
-      id: `exam-${patientId}-${i}-${Date.now()}-${Math.random()}`,
-      patientId,
+      id: `exam-${employeeId}-${index}-${Date.now()}-${Math.random()}`,
+      employeeId,
       name: examType,
       category,
-      date: status === 'completed'
-        ? generateRandomDate(sixMonthsAgo, now)
-        : status === 'scheduled'
-        ? futureDate.toISOString()
-        : generateRandomDate(sixMonthsAgo, now),
-      scheduledDate: status === 'scheduled' ? futureDate.toISOString() : undefined,
-      result: status === 'completed' ? 'Normal' : undefined,
-      notes: status === 'scheduled' ? 'Consulta agendada' : undefined,
+      date: examDate,
+      scheduledDate: status === 'scheduled' ? examDate : undefined,
+      expirationDate,
+      validityPeriod,
+      result: status === 'completed' ? 'Ok' : undefined,
+      notes: status === 'scheduled' ? 'Exame agendado' : undefined,
       status,
-      createdAt: generateRandomDate(sixMonthsAgo, now),
-      updatedAt: generateRandomDate(sixMonthsAgo, now),
+      createdAt: generateRandomDate(oneYearAgo, now),
+      updatedAt: new Date().toISOString(),
     };
 
     exams.push(exam);
-  }
+  });
 
   return exams;
 }
 
-export function generateMockPatients(count: number = 50): Patient[] {
-  const patients: Patient[] = [];
+export function generateMockEmployees(count: number = 50): Employee[] {
+  const employees: Employee[] = [];
 
   for (let i = 0; i < count; i++) {
     const name = BRAZILIAN_NAMES[i % BRAZILIAN_NAMES.length];
     const gender: 'M' | 'F' = Math.random() > 0.5 ? 'M' : 'F';
-    const age = Math.floor(Math.random() * 80) + 18;
-    const location =
-      BRAZILIAN_CITIES[Math.floor(Math.random() * BRAZILIAN_CITIES.length)];
-    const street = STREETS[Math.floor(Math.random() * STREETS.length)];
+    const age = Math.floor(Math.random() * 40) + 20; // Idade entre 20-60
+    const setor = SETORES[Math.floor(Math.random() * SETORES.length)];
+    const cargo = CARGOS[Math.floor(Math.random() * CARGOS.length)];
+    const turno = TURNOS[Math.floor(Math.random() * TURNOS.length)].codigo;
 
-    const examsCount = Math.floor(Math.random() * 8) + 2;
-    const patientId = `patient-${i}-${Date.now()}`;
-    const exams = generateMockExams(patientId, examsCount);
+    const examsCount = Math.floor(Math.random() * 5) + 4; // 4-8 exames
+    const employeeId = `employee-${i}-${Date.now()}`;
+    const exams = generateMockExams(employeeId, examsCount);
 
-    const zipCode = String(Math.floor(Math.random() * 90000000) + 10000000);
-    const formattedZipCode = zipCode.replace(/(\d{5})(\d{3})/, '$1-$2');
+    // Data de admissão (entre 1-10 anos atrás)
+    const dataAdmissao = new Date();
+    dataAdmissao.setFullYear(dataAdmissao.getFullYear() - Math.floor(Math.random() * 10) - 1);
 
-    patients.push({
-      id: patientId,
+    // Data do último ASO (data do exame mais recente completed)
+    const completedExams = exams.filter((e) => e.status === 'completed');
+    const dataUltimoASO =
+      completedExams.length > 0
+        ? completedExams.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
+        : new Date().toISOString();
+
+    employees.push({
+      id: employeeId,
       name,
       cpf: generateCPF(),
+      matricula: generateMatricula(),
       age,
       gender,
       email: generateEmail(name),
       phone: generatePhone(),
-      hasDocuments: Math.random() > 0.4, // 60% tem documentos, 40% não tem
-      address: {
-        street,
-        number: String(Math.floor(Math.random() * 9999) + 1),
-        city: location.city,
-        state: location.state,
-        zipCode: formattedZipCode,
-      },
-      examsCompleted: exams.filter((e) => e.status === 'completed'),
+      cargo,
+      turno,
+      setor,
+      dataAdmissao: dataAdmissao.toISOString(),
+      examsCompleted: exams.filter((e) => e.status === 'completed' || e.status === 'expired'),
       examsPending: exams
         .filter((e) => e.status === 'pending')
         .map((e) => e.name),
-      lastVisit: generateRandomDate(
-        new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-        new Date()
-      ),
-      createdAt: generateRandomDate(
-        new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        new Date()
-      ),
-      updatedAt: generateRandomDate(
-        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        new Date()
-      ),
+      dataUltimoASO,
+      createdAt: dataAdmissao.toISOString(),
+      updatedAt: new Date().toISOString(),
     });
   }
 
-  return patients;
+  return employees;
 }

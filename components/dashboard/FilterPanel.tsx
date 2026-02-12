@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { EXAM_TYPES, EXAM_STATUS_LABELS } from '@/constants/exams';
+import { ASO_EXAM_TYPES, EXAM_STATUS_LABELS } from '@/constants/exams';
 import { Filter, X } from 'lucide-react';
 
 interface FilterPanelProps {
@@ -45,7 +45,7 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os tipos</SelectItem>
-              {EXAM_TYPES.map((type) => (
+              {ASO_EXAM_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
                 </SelectItem>
